@@ -1,0 +1,21 @@
+service: serverless-aws-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+functions:
+  getProductsList:
+    handler: functions/getProductsList.getProductsList
+    events:
+      - http:
+          path: products
+          method: get
+  getProductsById:
+    handler:  functions/getProductsById.getProductsById
+    events:
+      - http:
+          path: /products/{productId}
+          method: get
