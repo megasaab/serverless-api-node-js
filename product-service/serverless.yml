@@ -9,13 +9,29 @@ provider:
 functions:
   getProductsList:
     handler: functions/getProductsList.getProductsList
+    environment:
+      TABLE_NAME: AWS_PRODUCTS_TABLE
     events:
       - http:
           path: products
           method: get
   getProductsById:
     handler:  functions/getProductsById.getProductsById
+    environment:
+      TABLE_NAME: AWS_PRODUCTS_TABLE
     events:
       - http:
           path: /products/{productId}
           method: get
+  insertData:
+    handler: functions/insertData.insertData
+    environment:
+      TABLE_NAME: AWS_PRODUCTS_TABLE
+  createProduct:
+    handler: functions.createProduct.createProduct
+    environment:
+      TABLE_NAME: AWS_PRODUCTS_TABLE
+    events:
+      - http:
+          method: post
+          path: products
