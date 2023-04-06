@@ -2,41 +2,38 @@ const AWS = require('aws-sdk');
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: process.env.region });
 
-module.exports.getProductsById = async (event) => {
+module.exports.createProduct = async (event) => {
     try {
-        const productId = event.pathParameters.productId;
+        const { name, price, stock } = JSON.parse(event.body);
 
+        // Create product
         const productParams = {
             TableName: process.env.PRODUCTS,
-            Key: {
-                id: productId,
+            Item: {
+                id: AWS.DynamoDB.DocumentClient.uuid(),
+                name,
+                price,
             },
         };
 
-        const productResult = await dynamoDB.get(productParams).promise();
-        const product = productResult.Item;
+        await dynamoDB.put(productParams).promise();
 
-        if (!product) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({ message: 'Product not found' }),
-            };
-        }
-
+        // Create stock
         const stockParams = {
             TableName: process.env.STOCKS,
-            Key: {
-                product_id: product.id,
+            Item: {
+                product_id: productParams.Item.id,
+                count: stock,
             },
         };
 
-        const stockResult = await dynamoDB.get(stockParams).promise();
-        const stock = stockResult.Item ? stockResult.Item.count : 0;
+        await dynamoDB.put(stockParams).promise();
 
-        const productWithStock = { ...product, stock };
+        // Return created product with stock information
+        const productWithStock = { ...productParams.Item, stock: stockParams.Item.count };
 
         return {
-            statusCode: 200,
+            statusCode: 201,
             headers: {
                 'Content-Type': 'application/json',
                 "Access-Control-Allow-Origin": "*",

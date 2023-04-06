@@ -9,13 +9,30 @@ provider:
 functions:
   getProductsList:
     handler: functions/getProductsList.getProductsList
+    environment:
+      PRODUCTS: products
+      STOCKS: stocks
     events:
       - http:
           path: products
           method: get
   getProductsById:
-    handler:  functions/getProductsById.getProductsById
+    handler: functions/getProductsById.getProductsById
+    environment:
+      PRODUCTS: products
+      STOCKS: stocks
     events:
       - http:
           path: /products/{productId}
           method: get
+  insertData:
+    handler: functions/insertData.insertData
+  createProduct:
+    handler: functions.createProduct.createProduct
+    environment:
+      PRODUCTS: products
+      STOCKS: stocks
+    events:
+      - http:
+          method: post
+          path: products
