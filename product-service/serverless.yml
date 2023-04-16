@@ -28,7 +28,7 @@ functions:
   insertData:
     handler: functions/insertData.insertData
   createProduct:
-    handler: functions.createProduct.createProduct
+    handler: functions/createProduct.createProduct
     environment:
       PRODUCTS: products
       STOCKS: stocks
