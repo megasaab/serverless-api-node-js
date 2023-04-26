@@ -6,6 +6,26 @@ provider:
   runtime: nodejs12.x
   region: us-east-1
 
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "catalogItemsQueue"
+
+    CreateProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: Create Product Topic
+
+    CreateProductEmailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        TopicArn:
+          Ref: CreateProductTopic
+        Endpoint: azhg.sabyrzhan@gmail.com
+
 functions:
   getProductsList:
     handler: functions/getProductsList.getProductsList
@@ -36,3 +56,11 @@ functions:
       - http:
           method: post
           path: products
+  catalogBatchProcess:
+    handler: functions/catalogBatchProcess.catalogBatchProcess
+    environment:
+      CREATE_PRODUCT_SNS_TOPIC_ARN: !Ref CreateProductTopic
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:363263407374:catalogItemsQueue
+          batchSize: 5

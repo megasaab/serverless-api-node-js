@@ -1,5 +1,6 @@
 const csvParser = require('csv-parser');
 const AWS = require('aws-sdk');
+const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 
 module.exports.importFileParser = async (event) => {
     try {
@@ -10,8 +11,13 @@ module.exports.importFileParser = async (event) => {
         const readableStream = s3.getObject({ Bucket: bucketName, Key: objectKey }).createReadStream();
         readableStream
             .pipe(csvParser())
-            .on('data', (data) => {
-                console.log('Parsed record:', data);
+            .on('data', async (data) => {
+                const params = {
+                    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/363263407374/catalogItemsQueue',
+                    MessageBody: JSON.stringify(data),
+                };
+                await sqs.sendMessage(params).promise();
+                console.log(`Sent SQS message: ${JSON.stringify(data)}`);
             })
             .on('end', async () => {
                 console.log('File parsing completed');
