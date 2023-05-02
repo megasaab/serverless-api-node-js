@@ -1,0 +1,12 @@
+service: authorization-service
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+
+functions:
+  basicAuthorizer:
+    handler:  functions/basicAuthorizer.basicAuthorizer
+    environment:
+      GITHUB_LOGIN: 'megasaab=TEST_PASSWORD'

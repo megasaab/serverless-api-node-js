@@ -22,6 +22,13 @@ functions:
       - http:
           path: import
           method: get
+          authorizer:
+            name: AuthorizationService-dev-basicAuthorizer
+            arn: arn:aws:lambda:us-east-1:363263407374:function:authorization-service-dev-basicAuthorizer
+            identitySource: method.request.header.Authorization
+            cors: true
+            identityValidationExpression: Basic [a-zA-Z0-9+/=]+
+
   importFileParser:
     handler: functions/importFileParser.importFileParser
     events:

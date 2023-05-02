@@ -15,6 +15,7 @@ module.exports.importProductsFile = async (event) => {
         return {
             statusCode: 200,
             headers: {
+                'Access-Control-Allow-Headers': '*',
                 'Content-Type': 'application/json',
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
