@@ -1,0 +1,40 @@
+service: node-in-cloud-s3
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: "arn:aws:s3:::node-in-cloud-s3/*"
+    - Effect: "Allow"
+      Action: "s3:ListBucket"
+      Resource: "arn:aws:s3:::node-in-cloud-s3"
+
+functions:
+  importProductsFile:
+    handler: functions/importProductsFile.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          authorizer:
+            name: AuthorizationService-dev-basicAuthorizer
+            arn: arn:aws:lambda:us-east-1:363263407374:function:authorization-service-dev-basicAuthorizer
+            identitySource: method.request.header.Authorization
+            cors: true
+            identityValidationExpression: Basic [a-zA-Z0-9+/=]+
+
+  importFileParser:
+    handler: functions/importFileParser.importFileParser
+    events:
+      - s3:
+          bucket: node-in-cloud-s3
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
